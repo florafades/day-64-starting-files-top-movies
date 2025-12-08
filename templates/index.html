@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container p-5">
     <h1 class="heading text-center">My Top Movies</h1>
-    <p class="description text-center">These are my favorite movies.</p>
+    <h5 class="description text-center pb-4">These are my favorite movies.</h5>
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center"> 
         
@@ -13,10 +13,10 @@
         <div class="col">
             <div class="card h-100 "> <img src="{{movie.img_url}}" class="card-img-top grayscale-img" alt="{{ movie.title }} poster" />
                 <div class="card-body text-center">
-                    <h5 class="card-title">{{movie.title}}</h5>
-                    <p class="card-text truncate-3">
+                    <h3 class="card-title">{{movie.title}}</h3>
+                    <h5 class="card-text">
                         {{movie.review}}
-                    </p>
+                    </h5>
                     <p class="card-text">
     {# ADDED IF STATEMENT TO HANDLE NULL/NONE VALUES #}
                 {% if movie.rating %}
@@ -35,7 +35,7 @@
         {% endfor %}
         
     </div>
-    <div class="text-center mt-4">
+    <div class="text-center mt-4 py-2">
     <a class="btn btn-primary" href="{{ url_for('add_movie') }}" role="button">Add Movie</a>
   </div>  
   </div>

@@ -24,10 +24,19 @@
 .btn-primary:hover,
 .btn-primary:focus,
 .btn-primary:active {
-  --bs-btn-bg: #005f5f !important;
-  --bs-btn-border-color: #005f5f !important;
-  background-color: #005f5f !important;
-  border-color: #005f5f !important;
+  --bs-btn-bg: #d3b87a !important;
+  --bs-btn-border-color: #d3b87a !important;
+  background-color: #d3b87a !important;
+  border-color: #d3b87a !important;
+}
+
+.btn-danger:hover,
+.btn-danger:focus,
+.btn-danger:active {
+  --bs-btn-bg: #d3b87a !important;
+  --bs-btn-border-color: #d3b87a !important;
+  background-color: #d3b87a !important;
+  border-color: #d3b87a  !important;
 }
 
 .bg-primary {
@@ -58,7 +67,7 @@
 
 /* --- 1. Header Font (MedievalSharp) --- */
 /* Target all heading tags and your custom '.heading' class. */
-h1, h2, h3, h4, h5, h6, .heading {
+h1, h2, h3, .heading {
     font-family: 'MedievalSharp' !important;
 }
 
@@ -66,6 +75,9 @@ h1, h2, h3, h4, h5, h6, .heading {
 /* Target all major text containers and general text elements directly. */
 body, 
 p, 
+h6,
+h5,
+h4,
 a, 
 li, 
 label, 
@@ -74,7 +86,7 @@ textarea,
 .card-text, 
 .card-title, 
 .btn {
-    font-family: 'MedievalSharp', monospace !important; 
+    font-family: 'Supermercado One', monospace !important; 
     /* Retaining your desired body text color: */
 }
 
@@ -89,5 +101,39 @@ textarea,
 
 .content {
     min-height: 100vh;
+}
+
+.card {
+    /* Use white for the card background to stand out from the body */
+    background-color: #2a2d3b; 
+    
+}
+
+
+.mb-3 {
+    padding: 0.5rem !important; /* This adds padding to all sides */
+}
+
+/* 2. NEW CSS: Add margin to the bottom of the form label */
+.mb-3 label {
+    /* Add a small margin (e.g., 5 pixels) below the label */
+    margin-bottom: 20px; 
+    /* Use Bootstrap's spacing scale if preferred (e.g., margin-bottom 1): */
+    /* margin-bottom: var(--bs-spacer) * 0.25; */
+}
+
+
+
+p a {
+    /* 1. Set your desired color */
+    color: #d3b87a; /* Example: A softer blue */
+}
+
+p a:hover {
+    /* Set the color when the user hovers */
+    color: #ad9763; /* Example: A darker blue on hover */
+    
+    /* Optional: Show underline on hover */
+    text-decoration: underline;
 }
 

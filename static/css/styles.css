@@ -137,3 +137,21 @@ p a:hover {
     text-decoration: underline;
 }
 
+.form-control {
+    /* Example 1: Use a light yellow color */
+    background-color: #212430;  /* Ivory/Cream color */
+    
+    /* Example 2: Use a light grey color */
+    /* background-color: #e9ecef; */
+    
+
+}
+
+.form-control:focus {
+    /* Use a slightly different color when the user clicks/tabs into the field */
+    background-color: #212430; /* Brighter white on focus */
+    
+    /* Optionally remove the default blue glow (box-shadow) */
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); /* Keeps the blue focus ring */
+    /* To remove the blue glow entirely, set box-shadow to 'none' or a custom color */
+}

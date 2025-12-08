@@ -4,14 +4,16 @@
 {% block title %}Add Movie{% endblock %}
 
 {% block content %}
-<div class="content">
-    <h1 class="heading">Add a Movie</h1>
-    <!--form pulls from the py form variable from main.py
-    passed by form=form from main
-    novalidate because main.py already has
-     validators=[DataRequired()]; server side validation
-     novalidate to avoid redundancy
-     no need for HTML5 validation-->
-    {{ render_form(form, novalidate=True) }}
+<div class="content d-flex flex-column justify-content-center align-items-center">
+    <div class="p-3 text-center" style="max-width: 500px; width: 90%;">
+        <h1 class="heading">Add a Movie</h1>
+        <!--form pulls from the py form variable from main.py
+        passed by form=form from main
+        novalidate because main.py already has
+        validators=[DataRequired()]; server side validation
+        novalidate to avoid redundancy
+        no need for HTML5 validation-->
+        {{ render_form(form, novalidate=True) }}
+    </div>
 </div>
 {% endblock %}

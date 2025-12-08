@@ -36,7 +36,7 @@ class Movie(db.Model):
     #mapped_column is a function of db.Model which our Movie() Class inherited
     #Integer is a class provided by SQLAlchemy's types module
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    title: Mapped[str] = mapped_column(String(250), nullable=False)
+    title: Mapped[str] = mapped_column(String(250), unique=True, nullable=False)
     year: Mapped[int] = mapped_column(Integer, nullable=False)
     description: Mapped[str] = mapped_column(String(500), nullable=False)
     rating: Mapped[float] = mapped_column(Float, nullable=True)
@@ -85,11 +85,16 @@ class RateMovieForm(FlaskForm):
 
 @app.route("/")
 def home():
-    result = db.session.execute(db.select(Movie).order_by(Movie.rating))
+    # 1. Sort the query by Movie.rating in DESCENDING order (highest rating first).
+    result = db.session.execute(db.select(Movie).order_by(db.desc(Movie.rating)))
     all_movies = result.scalars().all()  # convert ScalarResult to Python List
 
+    # 2. Update the ranking logic: 
+    # Since the list is now sorted high-to-low, the ranking calculation needs to be reversed
+    # so the first movie gets ranking 1, second gets 2, etc.
     for i in range(len(all_movies)):
-        all_movies[i].ranking = len(all_movies) - i
+        all_movies[i].ranking = i + 1  # The first item (i=0) gets rank 1
+    
     db.session.commit()
 
     return render_template("index.html", movies=all_movies)

@@ -17,6 +17,15 @@
                     <p class="card-text truncate-3">
                         {{movie.review}}
                     </p>
+                    <p class="card-text">
+    {# ADDED IF STATEMENT TO HANDLE NULL/NONE VALUES #}
+                {% if movie.rating %}
+                    {{   '  ‎ ⋆ ‎ ' * (movie.rating|round(0, 'ceil')|int) }}
+                {% else %}
+                    No Rating Yet
+                {% endif %}
+</p>
+                   
                     <a class="btn btn-primary" href="{{ url_for('rate_movie', id=movie.id) }}" role="button">Edit</a>
                     <a class="btn btn-danger" href="{{ url_for('delete_movie', id=movie.id) }}" role="button">Delete</a>
                 </div>

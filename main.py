@@ -10,6 +10,11 @@ import requests
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, validators
 
+MOVIE_DB_API_KEY = "c38110ce324d46ee83272ed81e474004"
+MOVIE_DB_SEARCH_URL = "https://api.themoviedb.org/3/search/movie"
+MOVIE_DB_INFO_URL = "https://api.themoviedb.org/3/movie"
+MOVIE_DB_IMAGE_URL = "https://image.tmdb.org/t/p/w500"
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 Bootstrap5(app)
@@ -23,9 +28,15 @@ db.init_app(app)
 
 
 ##CREATE TABLE
+#our new class, Movie() INHERITS all attrib. and functions of the db.Model class,
+#plus the attributes we create.
 class Movie(db.Model):
+    #id: sets the attrib. name
+    #Mapped[] creates metadata to hint at the data type most likely
+    #mapped_column is a function of db.Model which our Movie() Class inherited
+    #Integer is a class provided by SQLAlchemy's types module
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    title: Mapped[str] = mapped_column(String(250), unique=True, nullable=False)
+    title: Mapped[str] = mapped_column(String(250), nullable=False)
     year: Mapped[int] = mapped_column(Integer, nullable=False)
     description: Mapped[str] = mapped_column(String(500), nullable=False)
     rating: Mapped[float] = mapped_column(Float, nullable=True)
@@ -36,35 +47,15 @@ class Movie(db.Model):
 with app.app_context():
     db.create_all()
 
-## After adding the new_movie the code needs to be commented out/deleted.
-## So you are not trying to add the same movie twice. The db will reject non-unique movie titles.
-# new_movie = Movie(
-#     title="Phone Booth",
-#     year=2002,
-#     description="Publicist Stuart Shepard finds himself trapped in a phone booth, pinned down by an extortionist's sniper rifle. Unable to leave or receive outside help, Stuart's negotiation with the caller leads to a jaw-dropping climax.",
-#     rating=7.3,
-#     ranking=10,
-#     review="My favourite character was the caller.",
-#     img_url="https://image.tmdb.org/t/p/w500/tjrX2oWRCM3Tvarz38zlZM7Uc10.jpg"
-# )
-# with app.app_context():
-#     db.session.add(new_movie)
-#     db.session.commit()
-# second_movie = Movie(
-#     title="Avatar The Way of Water",
-#     year=2022,
-#     description="Set more than a decade after the events of the first film, learn the story of the Sully family (Jake, Neytiri, and their kids), the trouble that follows them, the lengths they go to keep each other safe, the battles they fight to stay alive, and the tragedies they endure.",
-#     rating=7.3,
-#     ranking=9,
-#     review="I liked the water.",
-#     img_url="https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg"
-# )
-# with app.app_context():
-#     db.session.add(second_movie)
-#     db.session.commit()
-
-with app.app_context():
-    db.create_all()
+#this form populates on the /add page
+#FlaskForm is a Flas-WTF base class from the library
+#contains form classes for submit, validate, fields, ect
+class FindMovieForm(FlaskForm):
+    #StringField = <input type="text">
+    #DataReuired ins built in flaskwtf validator, requires text to be present b4 submit
+    title = StringField("Movie Title", validators=[DataRequired()])
+    #SubmitField = <input type="submit"> = submission button
+    submit = SubmitField("Add Movie")
 
 class RateMovieForm(FlaskForm):
     # --- New Rating Field (Dropdown) ---
@@ -89,16 +80,77 @@ class RateMovieForm(FlaskForm):
     )
     # -----------------------------------
 
-    review = StringField("Your Review")
+    review = StringField("Your Review (optional)")
     submit = SubmitField("Done")
 
 @app.route("/")
 def home():
-    #runs SQL query, a SELECT statement
-    result = db.session.execute(db.select(Movie))
-    #convert query results into usable py obj
-    all_movies = result.scalars().all()
+    result = db.session.execute(db.select(Movie).order_by(Movie.rating))
+    all_movies = result.scalars().all()  # convert ScalarResult to Python List
+
+    for i in range(len(all_movies)):
+        all_movies[i].ranking = len(all_movies) - i
+    db.session.commit()
+
     return render_template("index.html", movies=all_movies)
+
+#"Add" Route
+@app.route("/add", methods=["GET", "POST"])
+def add_movie():
+    #Form obj we created earlier
+    form = FindMovieForm()
+
+    if form.validate_on_submit():
+        #form.title =  StringField("Movie Title", validators=[DataRequired()])
+        #form.title.data = whatever string the user entered; the data contained in form.title
+        movie_title = form.title.data
+        #response is an instance of the requests.Response Class
+        #response.url = {MOVIE_DB_SEARCH_URL}?api_key="{MOVIE_DB_API_KEY}"&"query"={movie_title}
+        response = requests.get(MOVIE_DB_SEARCH_URL, params={"api_key": MOVIE_DB_API_KEY, "query": movie_title})
+        #store the JSON data of the response obj as a dict object (or list in some cases):
+        #then get the VALUE of the KEY "results"
+        data = response.json()["results"]
+        #interupts execution of add_movie() to go to select.html page
+        #select.html as an "options" variable
+        #return line sets options=data=response.json()["results"] which renders the API's results list
+        #url of select.html page is still /add because it is rendered within the /add route.
+        return render_template("select.html", options=data)
+
+    #Take the Python object currently stored in the variable form (right side) and make it available in the template under the new variable name form (left side).
+    #form=form is more concise and it makes it clear that you are passing the same thing from py to html template
+    return render_template("add.html", form=form)
+
+#find route interactes with the api
+@app.route("/find")
+def find_movie():
+    #after user selects movie, the API's "id" gets passed into the url from the select.html page
+    #request.args.get reads the url and gets the id
+    #code then queries the API to pull data assoc. with the API's movie's id
+    movie_api_id = request.args.get("id")
+    if movie_api_id:
+        movie_api_url = f"{MOVIE_DB_INFO_URL}/{movie_api_id}"
+        #requests.get() creates and returns a requests.Response object.
+        #the object type of the response variable type is requests.Response, a class obj
+        #Response is capitalized because it is the Class; a blueprint.
+        #where as response.get is lower case because it is a instance or object of the class requests.Response
+        #response.url = {movie_api_url}?api_key={MOVIE_DB_API_KEY}&language=en-US
+        response = requests.get(movie_api_url, params={"api_key": MOVIE_DB_API_KEY, "language": "en-US"})
+        #converts data of the API into a dict or list depending on the data stored in the api
+        data = response.json()
+        #funnel contents of data obj into a special object that can be added to our database
+        new_movie = Movie(
+            #set title or db row to the VALUE of the KEY of the data dict, "title"
+            title=data["title"],
+            #The data in release_date includes month and day, we will want to get rid of.
+            year=data["release_date"].split("-")[0],
+            img_url=f"{MOVIE_DB_IMAGE_URL}{data['poster_path']}",
+            description=data["overview"]
+        )
+        #adds contents of new_movie to SQL db
+        db.session.add(new_movie)
+        db.session.commit()
+        #after addng movie to db, it redirects to /edit to allow you to rate it
+        return redirect(url_for("rate_movie", id=new_movie.id))
 
 # Adding the Update functionality
 @app.route("/edit", methods=["GET", "POST"])
@@ -116,7 +168,7 @@ def rate_movie():
 #add the delete functionality
 @app.route("/delete")
 def delete_movie():
-    #flask request object reads and incoming HTTP request
+    #flask request object reads an incoming HTTP request
     #request.args points to the key-value pair eg id=12
     #reuests.path points to the path eg "/delete"
     movie_id = request.args.get("id")
@@ -126,11 +178,9 @@ def delete_movie():
     #db.session = temp container to keep track of queries / transactions
     db.session.delete(movie)
     db.session.commit()
-    return redirect(url_for('home'))
-
-
-
-
+    #redirects us to the url assoc. with the home() function
+    #the url of the home() function is "/", or the root
+    return redirect(url_for("home"))
 
 if __name__ == '__main__':
     app.run(debug=True)

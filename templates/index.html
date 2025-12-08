@@ -1,36 +1,37 @@
 {% extends 'base.html' %}
-
 {% block title %}My Top 10 Movies{% endblock %}
 
 {% block content %}
-<div class="container">
-  <h1 class="heading">My Top 10 Movies</h1>
-  <p class="description">These are my all-time favourite movies.</p>
-   
-  {% for movie in movies %}
-  <div class="card" >
-    <div class="front" style="background-image: url('{{movie.img_url}}');">
-        <p class="large">{{movie.ranking}}</p>
-    </div>
-    <div class="back">
-      <div>
-    <div class="title">{{movie.title}} <span class="release_date">{{movie.year}}</span></div>
-        <div class="rating">
-            <label>{{movie.rating}}</label>
-          <i class="fas fa-star star"></i>
-        </div>
-          <p class="review">{{movie.review}}</p>
-        <p class="overview">{{movie.description}}</p>
+<div class="container p-5">
+    <h1 class="heading text-center">My Top Movies</h1>
+    <p class="description text-center">These are my favorite movies.</p>
 
-        <a href="{{ url_for('rate_movie', id=movie.id) }}" class="button">Update</a>
-        <a href="{{ url_for('delete_movie', id=movie.id) }}" class="button delete-button">Delete</a>
-      </div>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center"> 
+        
+        {% for movie in movies %} 
+        
+        <div class="col">
+            <div class="card h-100 "> <img src="{{movie.img_url}}" class="card-img-top grayscale-img" alt="{{ movie.title }} poster" />
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{movie.title}}</h5>
+                    <p class="card-text truncate-3">
+                        {{movie.review}}
+                    </p>
+                    <a class="btn btn-primary" href="{{ url_for('rate_movie', id=movie.id) }}" role="button">Edit</a>
+                    <a class="btn btn-danger" href="{{ url_for('delete_movie', id=movie.id) }}" role="button">Delete</a>
+                </div>
+            </div>
+        </div>
+        
+        {% endfor %}
+        
     </div>
+    <div class="text-center mt-4">
+    <a class="btn btn-primary" href="{{ url_for('add_movie') }}" role="button">Add Movie</a>
+  </div>  
   </div>
-  {% endfor %}
-</div>
 <div class="container text-center add">
-<a href="#" class="button">Add Movie</a>
+    
 </div>
 
 {% endblock %}

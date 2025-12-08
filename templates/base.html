@@ -1,39 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
+<html lang="en" data-bs-theme="dark">
+<head>
     <meta charset="UTF-8" />
     <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        name="viewport"
+        content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
 
     {% block styles %}
-    <!-- Load Bootstrap-Flask CSS here -->
+    {# 1. Bootstrap 5 CSS (Using Flask-Bootstrap extension method) #}
     {{ bootstrap.load_css() }}
-    <!-- Link to the styles.css here to apply styling to all the child templates.-->
+
+    {# 2. NEW: Google Fonts Links #}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=MedievalSharp&display=swap" rel="stylesheet">
+    
+    {# 2. Your Custom CSS (Placed after Bootstrap to allow overrides) #}
     <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,700"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Poppins:300,400,700"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
-      integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
-      crossorigin="anonymous"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/styles.css') }}"
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/styles.css') }}"
     />
     {% endblock %}
 
     <title>{% block title %}{% endblock %}</title>
-  </head>
-  <body>
+</head>
+<body class="site-background">
     {% block content %}{% endblock %}
-  </body>
+    
+    {# Optional: If you need Bootstrap JavaScript components (navbars, modals, etc.) #}
+    {{ bootstrap.load_js() }}
+</body>
 </html>

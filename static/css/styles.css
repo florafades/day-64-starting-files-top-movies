@@ -52,26 +52,19 @@
 .site-background {
     
     
-    /* 1. Specify the image file and path */
     background-image: url('../img/bluedarkclstars.gif'); 
     
-    /* 2. Ensure the image repeats to fill the space */
     background-repeat: repeat; 
     
-    /* 3. Make sure it doesn't scroll with the content */
     background-attachment: fixed; 
     
-    /* Ensure the background covers the full viewport height */
     min-height: 100vh; 
 }
 
-/* --- 1. Header Font (MedievalSharp) --- */
-/* Target all heading tags and your custom '.heading' class. */
 h1, h2, h3, .heading {
     font-family: 'MedievalSharp' !important;
 }
 
-/* --- 2. Body/Text Font (Courier Prime) --- */
 /* Target all major text containers and general text elements directly. */
 body, 
 p, 
@@ -87,14 +80,12 @@ textarea,
 .card-title, 
 .btn {
     font-family: 'Supermercado One', monospace !important; 
-    /* Retaining your desired body text color: */
 }
 
 .truncate-3 {
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    /* Change the number below to set the line limit */
     -webkit-line-clamp: 3; 
    
 }
@@ -104,9 +95,7 @@ textarea,
 }
 
 .card {
-    /* Use white for the card background to stand out from the body */
     background-color: #2a2d3b; 
-    
 }
 
 
@@ -114,44 +103,26 @@ textarea,
     padding: 0.5rem !important; /* This adds padding to all sides */
 }
 
-/* 2. NEW CSS: Add margin to the bottom of the form label */
+/* Add margin to the bottom of the form label */
 .mb-3 label {
-    /* Add a small margin (e.g., 5 pixels) below the label */
     margin-bottom: 20px; 
-    /* Use Bootstrap's spacing scale if preferred (e.g., margin-bottom 1): */
-    /* margin-bottom: var(--bs-spacer) * 0.25; */
 }
 
 
 
 p a {
-    /* 1. Set your desired color */
-    color: #d3b87a; /* Example: A softer blue */
+    color: #d3b87a;
 }
 
 p a:hover {
-    /* Set the color when the user hovers */
-    color: #ad9763; /* Example: A darker blue on hover */
-    
-    /* Optional: Show underline on hover */
+    color: #ad9763; 
     text-decoration: underline;
 }
 
 .form-control {
-    /* Example 1: Use a light yellow color */
-    background-color: #212430;  /* Ivory/Cream color */
-    
-    /* Example 2: Use a light grey color */
-    /* background-color: #e9ecef; */
-    
-
+    background-color: #212430;  
 }
 
 .form-control:focus {
-    /* Use a slightly different color when the user clicks/tabs into the field */
-    background-color: #212430; /* Brighter white on focus */
-    
-    /* Optionally remove the default blue glow (box-shadow) */
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); /* Keeps the blue focus ring */
-    /* To remove the blue glow entirely, set box-shadow to 'none' or a custom color */
+    background-color: #212430; 
 }

@@ -3,44 +3,45 @@
 
 {% block content %}
 <div class="container p-5">
-    <h1 class="heading text-center">My Top Movies</h1>
-    <h5 class="description text-center pb-4">These are my favorite movies.</h5>
+  <h1 class="heading text-center">My Top Movies</h1>
+  <h5 class="description text-center pb-4">These are my favorite movies.</h5>
 
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center"> 
-        
-        {% for movie in movies %} 
-        
-        <div class="col">
-            <div class="card h-100 "> <img src="{{movie.img_url}}" class="card-img-top grayscale-img" alt="{{ movie.title }} poster" />
-                <div class="card-body text-center">
-                    <h3 class="card-title">{{movie.title}}</h3>
-                    <h5 class="card-text">
-                        {{movie.review}}
-                    </h5>
-                    <p class="card-text">
-    {# ADDED IF STATEMENT TO HANDLE NULL/NONE VALUES #}
-                {% if movie.rating %}
-                    {{   '  ‎ ⋆ ‎ ' * (movie.rating|round(0, 'ceil')|int) }}
-                {% else %}
-                    No Rating Yet
-                {% endif %}
-</p>
-                   
-                    <a class="btn btn-primary" href="{{ url_for('rate_movie', id=movie.id) }}" role="button">Edit</a>
-                    <a class="btn btn-danger" href="{{ url_for('delete_movie', id=movie.id) }}" role="button">Delete</a>
-                </div>
-            </div>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center">
+
+    {% for movie in movies %}
+
+    <div class="col">
+      <div class="card h-100 "> <img src="{{movie.img_url}}" class="card-img-top grayscale-img"
+          alt="{{ movie.title }} poster" />
+        <div class="card-body text-center">
+          <h3 class="card-title">{{movie.title}}</h3>
+          <h5 class="card-text">
+            {{movie.review}}
+          </h5>
+          <p class="card-text">
+            {# ADDED IF STATEMENT TO HANDLE NULL/NONE VALUES #}
+            {% if movie.rating %}
+            {{ ' ‎ ⋆ ‎ ' * (movie.rating|round(0, 'ceil')|int) }}
+            {% else %}
+            No Rating Yet
+            {% endif %}
+          </p>
+
+          <a class="btn btn-primary" href="{{ url_for('rate_movie', id=movie.id) }}" role="button">Edit</a>
+          <a class="btn btn-danger" href="{{ url_for('delete_movie', id=movie.id) }}" role="button">Delete</a>
         </div>
-        
-        {% endfor %}
-        
+      </div>
     </div>
-    <div class="text-center mt-4 py-2">
-    <a class="btn btn-primary" href="{{ url_for('add_movie') }}" role="button">Add Movie</a>
-  </div>  
+
+    {% endfor %}
+
   </div>
+  <div class="text-center mt-4 py-2">
+    <a class="btn btn-primary" href="{{ url_for('add_movie') }}" role="button">Add Movie</a>
+  </div>
+</div>
 <div class="container text-center add">
-    
+
 </div>
 
 {% endblock %}

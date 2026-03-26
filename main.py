@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, session
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -9,6 +9,8 @@ from wtforms.validators import DataRequired
 import requests
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, validators
+import os
+import uuid
 
 MOVIE_DB_API_KEY = "c38110ce324d46ee83272ed81e474004"
 MOVIE_DB_SEARCH_URL = "https://api.themoviedb.org/3/search/movie"
@@ -22,7 +24,7 @@ Bootstrap5(app)
 ##CREATE DB
 class Base(DeclarativeBase):
     pass
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///movies.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///movies.db')
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
@@ -36,6 +38,7 @@ class Movie(db.Model):
     #mapped_column is a function of db.Model which our Movie() Class inherited
     #Integer is a class provided by SQLAlchemy's types module
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    session_id: Mapped[str] = mapped_column(String(100), nullable=True)
     title: Mapped[str] = mapped_column(String(250), unique=True, nullable=False)
     year: Mapped[int] = mapped_column(Integer, nullable=False)
     description: Mapped[str] = mapped_column(String(500), nullable=False)
@@ -85,8 +88,15 @@ class RateMovieForm(FlaskForm):
 
 @app.route("/")
 def home():
+    # Generate a session ID if this is a new visitor
+    if "session_id" not in session:
+        session["session_id"] = str(uuid.uuid4())
+    
+    current_session_id = session["session_id"]
+
     # 1. Sort the query by Movie.rating in DESCENDING order (highest rating first).
-    result = db.session.execute(db.select(Movie).order_by(db.desc(Movie.rating)))
+    # Only fetch movies belonging to this session
+    result = db.session.execute(db.select(Movie).where(Movie.session_id == current_session_id).order_by(db.desc(Movie.rating)))
     all_movies = result.scalars().all()  # convert ScalarResult to Python List
 
     # 2. Update the ranking logic: 
@@ -128,33 +138,20 @@ def add_movie():
 #find route interactes with the api
 @app.route("/find")
 def find_movie():
-    #after user selects movie, the API's "id" gets passed into the url from the select.html page
-    #request.args.get reads the url and gets the id
-    #code then queries the API to pull data assoc. with the API's movie's id
     movie_api_id = request.args.get("id")
     if movie_api_id:
         movie_api_url = f"{MOVIE_DB_INFO_URL}/{movie_api_id}"
-        #requests.get() creates and returns a requests.Response object.
-        #the object type of the response variable type is requests.Response, a class obj
-        #Response is capitalized because it is the Class; a blueprint.
-        #where as response.get is lower case because it is a instance or object of the class requests.Response
-        #response.url = {movie_api_url}?api_key={MOVIE_DB_API_KEY}&language=en-US
         response = requests.get(movie_api_url, params={"api_key": MOVIE_DB_API_KEY, "language": "en-US"})
-        #converts data of the API into a dict or list depending on the data stored in the api
         data = response.json()
-        #funnel contents of data obj into a special object that can be added to our database
         new_movie = Movie(
-            #set title or db row to the VALUE of the KEY of the data dict, "title"
             title=data["title"],
-            #The data in release_date includes month and day, we will want to get rid of.
             year=data["release_date"].split("-")[0],
             img_url=f"{MOVIE_DB_IMAGE_URL}{data['poster_path']}",
-            description=data["overview"]
+            description=data["overview"],
+            session_id=session.get("session_id")  # 👈 this is the only new line
         )
-        #adds contents of new_movie to SQL db
         db.session.add(new_movie)
         db.session.commit()
-        #after addng movie to db, it redirects to /edit to allow you to rate it
         return redirect(url_for("rate_movie", id=new_movie.id))
 
 # Adding the Update functionality
